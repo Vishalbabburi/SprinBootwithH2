@@ -2,6 +2,7 @@ package com.example.SpringBootH2.controllers;
 
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,14 +11,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.SpringBootH2.Exceptions.StudentNotFoundException;
 import com.example.SpringBootH2.Repositories.StudentDao;
 import com.example.SpringBootH2.entities.Student;
 
 @RestController
-public class StudentRestController {
+@RequestMapping("/api")
+public class StudentRestController  {
 	@Autowired
 	private StudentDao autoDao;
 	
@@ -27,11 +31,11 @@ public class StudentRestController {
 	}
 	@GetMapping("/getStudent/{id}")
 	public Student getStudentByid(@PathVariable("id") int theid){
-		return autoDao.findById(theid).orElse(null);
+		return autoDao.findById(theid).orElseThrow(()-> new StudentNotFoundException("Student with id : "+theid+" not found")); //if not found we will throw our custom exception
 	}
 	
 	@PostMapping("/addStudent")
-	public String addStudent(@RequestBody Student thestudent) {
+	public String addStudent(@RequestBody Student thestudent){
 		System.out.println(autoDao.save(thestudent));
 		autoDao.save(thestudent);
 		return "student saved succesfully";
@@ -44,7 +48,7 @@ public class StudentRestController {
 	
 	@PutMapping("/updateName/{id}")
 	public String updateName(@PathVariable("id") int theid,
-			@RequestParam(name="nameofperson", defaultValue="Pranav") String thename) {
+			@RequestParam(name="nameofperson", defaultValue="Pranav") String thename){
 		
 		// the RequestParam called nameofperson(which is a key) is sent during put request using postman
 		//eg: in put request param if nameofperson = "vishal" then thename="vishal" 
@@ -55,7 +59,7 @@ public class StudentRestController {
 	}
 	
 	@PutMapping("/updateStudent")
-	public String updateStudent(@RequestBody Student thestudent) {
+	public String updateStudent(@RequestBody Student thestudent){
 		
 		//finally call save method and pass student to be updated to it
 		//the save method will create new student if not there or will update if he is already there
@@ -69,7 +73,7 @@ public class StudentRestController {
 	public String deletestudent(@PathVariable("id") int theid) {
 		//first retrieve student with the given id and then delete that student
 		
-		Student StudentTobeDeleted=autoDao.findById(theid).orElse(null);
+		Student StudentTobeDeleted=autoDao.findById(theid).orElseThrow(()->new StudentNotFoundException("Student with id : \"+theid+\" not found to delete"));
 		autoDao.delete(StudentTobeDeleted);
 		return "student with id: "+theid+" deleted successfully ";
 	}
