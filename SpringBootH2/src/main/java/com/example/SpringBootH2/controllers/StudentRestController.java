@@ -2,7 +2,6 @@ package com.example.SpringBootH2.controllers;
 
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,10 +34,9 @@ public class StudentRestController  {
 	}
 	
 	@PostMapping("/addStudent")
-	public String addStudent(@RequestBody Student thestudent){
-		System.out.println(autoDao.save(thestudent));
-		autoDao.save(thestudent);
-		return "student saved succesfully";
+	public Student addStudent(@RequestBody Student thestudent){
+		
+		return autoDao.save(thestudent);
 	}
 	
 	@GetMapping("/getStudents/{major}")
